@@ -1,0 +1,154 @@
+# 🕸️ Web Scraping & Data Processing Task
+
+## 📖 Overview
+
+This project is a professional web scraping tool designed to extract product data from a static e-commerce website. The
+content is fully available in the initial HTML response, so no JavaScript rendering or browser automation was required.
+
+- Fetching product information: title, price, URL, rating.
+- Cleaning and transforming the data.
+- Storing it in a local SQLite database.
+- Serving the data through a simple RESTful API using Flask.
+
+The implementation follows a functional and modular structure, using `requests` and `BeautifulSoup`, while avoiding
+unnecessary complexity.
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/jihadbahr/web-scraper.git
+cd web-scraper
+```
+
+### 2. Create a virtual environment
+
+```
+python3 -m venv venv
+source venv/bin/activate       # Unix/MacOS
+venv\Scripts\activate          # Windows
+```
+
+### 3. Install the required packages
+
+```
+pip install -r requirements.txt
+```
+
+## 🚀 Usage
+
+### Run the scraper and save data to the database:
+
+```
+python main.py
+```
+
+### Run the Flask API to access product data:
+
+```
+cd api
+python api.py
+```
+
+The server will be available at: http://127.0.0.1:5000/products
+
+## 🧪 Testing
+
+### Run test cases using:
+
+```
+pytest
+```
+
+## 💾 Database
+
+### SQLite is used as a local database for simplicity.
+
+The Product table includes:
+
+```
+id (auto-generated integer)
+title (string)
+price (float)
+url (unique text field)
+rating (integer)
+```
+
+The url is treated as a unique identifier to avoid duplicate entries. If the same product is scraped again, it will be
+updated, not duplicated.
+
+## 🧹 Data Cleaning
+
+* Removes unwanted symbols from price values (e.g., $, ,).
+* Converts price and rating to appropriate numeric types.
+* Handles missing values gracefully with defaults or None.
+
+## 🧱 Project Structure
+
+```
+web-scraper/
+├── api
+│   └── api.py
+├── models
+│   └── schema.py
+├── scraper
+│   ├── __init__.py
+│   ├── cleaner.py
+│   ├── db_utils.py
+│   ├── scraper.py
+│   └── utils.py
+├── tests
+│   ├── __init__.py
+│   └── test_cleaner.py
+├── main.py
+├── requirements.txt
+└── README.md
+```
+## 📌 Technical Notes & Design Rationale
+
+1. **Class-based design was avoided**
+   A functional approach was preferred to keep the project simple and readable, considering the limited scope. Classes would be excessive for this level of complexity.
+
+2. **Pydantic was not used**
+   Input validation was done manually to avoid unnecessary dependencies and overhead. The dataset is not complex enough to justify a full data validation layer.
+
+3. **Memory usage considerations**
+   The current approach loads all products into memory before saving. This is suitable for small-to-medium datasets.
+   For large-scale scraping:
+   - Stream processing or chunked writing can be used.
+   - Save each product immediately to the database.
+   - Use generators instead of accumulating lists.
+
+4. **`requests.Session()` was not used**
+   The target site did not require session persistence, cookies, or headers reuse. For high-volume or authenticated scraping, `Session()` would be advisable.
+
+5. **Used `select()` instead of `find()`**
+   CSS selectors via `select()` provide clearer, more flexible querying for complex DOM structures, improving maintainability.
+
+6. **Concurrency was not implemented**
+   Given the limited number of pages and fast response times, concurrency was unnecessary. It can be added later if performance bottlenecks arise.
+
+7. **`utils.py` was created for future use**
+   While unused in this iteration, it provides a placeholder for future helper functions such as request handlers, logging utilities, etc.
+
+8. **Simple API design**
+   The API is intentionally minimal — one endpoint, easy to run locally, ideal for reviewing the scraped results quickly.
+
+9. **URL field used as unique key**
+   The URL uniquely identifies each product. When inserting new records, the scraper will update existing rows with the same URL instead of duplicating them.
+
+## 🌱 Future Enhancements
+
+* Add advanced error handling and retry logic.
+* Enable proxy rotation and request throttling.
+
+## 👤 Author
+
+**Jihad K. Bahr**
+
+Senior Python Developer
+
+Apr - 2025
